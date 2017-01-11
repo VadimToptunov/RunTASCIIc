@@ -18,9 +18,7 @@ This screensaver was constructed by me not only just for fun, but also as an exc
 
 import random
 import string
-import sys
 from Tkinter import *
-import time
 
 
 def key(event):
