@@ -1,7 +1,7 @@
 #"__author__" == "Vadim Toptunov"
 # "__name__" = "RunThASCIIc-v1.0.0"
 """
-RunThASCIIc-v1.0.0
+RunTASCIIc-v1.0.0
 
 This screensaver was constructed by me not only just for fun, but also as an excercise for
  GUI programming on Python.
@@ -26,6 +26,7 @@ def key(event):
     root.destroy()
 
 root = Tk() # Run Tkinter
+root.title("RunTASCIIc-v.1.0.0")
 root.attributes('-fullscreen', True) # Run the window in full-screen mode
 root.bind("<Key>", key) # Bind the press of any key
 
