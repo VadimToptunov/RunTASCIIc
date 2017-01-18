@@ -1,5 +1,5 @@
 #"__author__" == "Vadim Toptunov"
-# "__name__" = "RunThASCIIc-v1.0.0"
+# "__name__" = "RunThASCIIc-v1.0.2"
 
 
 """
