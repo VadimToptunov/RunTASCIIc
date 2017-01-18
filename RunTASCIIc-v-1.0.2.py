@@ -101,7 +101,7 @@ def random_version_choice():
         root.mainloop()
 
     else:
-        # version 3 is coming. It would show code from some python files and files from other extensions
+        # version 5 is coming. It would show code from some python files and files from other extensions
         pass
 
 if __name__ == "__main__":
