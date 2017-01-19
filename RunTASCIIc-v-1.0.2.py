@@ -3,17 +3,16 @@
 
 
 """
-RunTASCIIc-v1.0.0
+RunTASCIIc-v1.0.2
 This screensaver was constructed by me not only just for fun, but also as an excercise for
  GUI programming on Python.
  The screensaver opens a full-screen GUI window (black), randomly chooses a colour for text,
- randomly chooses version and shows you some random characters printed. It can be closed with any key pressed.
- The project will be improved in such ways:
- 1. It will lock the screen for Linux if you do nothing;
- 2. It will get the 5th version, where random Python or file with some other extension
+ randomly chooses version, shows you some random characters printed and locks screen. It can be closed with any key pressed.
+ The project will be improved in such way:
+ 1.It will get the 5th version, where random Python or file with some other extension
    will be shown as a text in the GUI window.
 """
-
+import os
 import random
 import string
 from Tkinter import *
@@ -21,7 +20,29 @@ from Tkinter import *
 
 def key(event):
     # Closes the app if any key is pressed.
+    lock_screen()
     root.destroy()
+    
+    
+def lock_screen():
+    # Locks the screen
+    os_name = os.name
+
+    if os_name == 'posix':
+        try:
+            os.popen("gnome-screensaver-command -l")
+        except Exception as exc:
+            print exc
+            # print "PPPPPPPPPP"
+
+    elif os_name == 'windows':
+        try:
+            winpath = os.environ["windir"]
+            os.system(winpath + r'\system32\rundll32 user32.dll, LockWorkStation')
+        except Exception as exc:
+            print exc
+    else:
+        pass
 
 root = Tk() # Run Tkinter
 root.title("RunTASCIIc-v.1.0.0")
