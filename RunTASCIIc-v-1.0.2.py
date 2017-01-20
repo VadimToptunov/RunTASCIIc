@@ -35,7 +35,7 @@ def lock_screen():
             print exc
             # print "PPPPPPPPPP"
 
-    elif os_name == 'windows':
+    elif os_name == 'windows' or os_name == 'nt':
         try:
             winpath = os.environ["windir"]
             os.system(winpath + r'\system32\rundll32 user32.dll, LockWorkStation')
