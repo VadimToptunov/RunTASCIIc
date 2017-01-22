@@ -15,7 +15,7 @@ This screensaver was constructed by me not only just for fun, but also as an exc
 import os
 import random
 import string
-from Tkinter import *
+import Tkinter as tk
 
 
 def key(event):
@@ -33,7 +33,6 @@ def lock_screen():
             os.popen("gnome-screensaver-command -l")
         except Exception as exc:
             print exc
-            # print "PPPPPPPPPP"
 
     elif os_name == 'windows' or os_name == 'nt':
         try:
@@ -44,13 +43,13 @@ def lock_screen():
     else:
         pass
 
-root = Tk() # Run Tkinter
-root.title("RunTASCIIc-v.1.0.0")
+root = tk.Tk() # Run Tkinter
+root.title("RunTASCIIc-v.1.0.2")
 root.attributes('-fullscreen', True) # Run the window in full-screen mode
 root.bind("<Key>", key) # Bind the press of any key
 
-color = random.choice(['red', 'green', 'blue', 'violet', 'white', 'yellow']) # Set random color
-text = Text(root, font="Courier 20", bg="Black", fg=color) # Create text and text parameters
+color = random.choice(('red', 'green', 'blue', 'violet', 'white', 'yellow')) # Set random color
+text = tk.Text(root, font="Courier 20", bg="Black", fg=color) # Create text and text parameters
 text.pack(expand=True, fill="both")
 
 
@@ -69,21 +68,21 @@ def unicode_chars():
     random_word = u''.join([random.choice(chars) for i in range(random_integer)])
     random_word = random_word + "\n"
     random_word = random_word.encode('utf-8')
-    text.insert(END, random_word)
+    text.insert(tk.END, random_word)
     text.see("end")
     text.after(500, unicode_chars)
 
 
 def char101():
-    ch101 = random.choice(['0', '1', ' '])
-    text.insert(END, ch101)
+    ch101 = random.choice(('0', '1', ' '))
+    text.insert(tk.END, ch101)
     text.see("end")
     text.after(1, char101)
 
 
 def slash():
-    slashh = random.choice(['/', "\/", '?', 'X', 'O', '|', ' ', '~', '<', '>', '[', ']'])
-    text.insert(END, slashh)
+    slashh = random.choice(('/', "\/", '?', 'X', 'O', '|', ' ', '~', '<', '>', '[', ']'))
+    text.insert(tk.END, slashh)
     text.see("end")
     text.after(1, slash)
 
@@ -96,14 +95,14 @@ def random_chars():
 
     random_word_print = random_word_print + "\n"
 
-    text.insert(END, random_word_print)
+    text.insert(tk.END, random_word_print)
     text.see("end")
     text.after(500, random_chars)
 
 
 def random_version_choice():
     # Chooses random version to show
-    version = random.choice(['v1', 'v2', 'v3', 'v4'])
+    version = random.choice(('v1', 'v2', 'v3', 'v4'))
 
     if version == 'v1':
         # If version 1 is chosen, then random chars from Thai, Georgian and some other alphabets
