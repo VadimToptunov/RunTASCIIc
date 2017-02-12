@@ -2,6 +2,13 @@
 # "__name__" = "RunThASCIIc-v1.0.2"
 
 
+|~\    /|\   |\    /   |    | | |
+|  \  / | \  | \  /    |    | | |
+|  / /  |  \ |\  /____ |    | | |
+|_/     |    | \     / |\   | | |\
+| \     |    |      /  | \  | | | \
+|  \    |    |     /   |  \ | | |  \
+
 """
 RunTASCIIc-v1.0.2
 This screensaver was constructed by me not only just for fun, but also as an excercise for
@@ -9,7 +16,7 @@ This screensaver was constructed by me not only just for fun, but also as an exc
  The screensaver opens a full-screen GUI window (black), randomly chooses a colour for text,
  randomly chooses version, shows you some random characters printed and locks screen. It can be closed with any key pressed.
  The project will be improved in such way:
- 1.It will get the 5th version, where random Python or file with some other extension
+ 1.It will get the 5th version, where random Python file or file with some other extension
    will be shown as a text in the GUI window.
 """
 import os
