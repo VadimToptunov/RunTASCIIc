@@ -1,7 +1,7 @@
 #"__author__" == "Vadim Toptunov"
 # "__name__" = "RunThASCIIc-v1.0.2"
 
-
+"""
 88888888ba                     888888888888   db        ad88888ba    ,ad8888ba,  88 88   ,ad8888ba,
 88      "8b                         88       d88b      d8"     "8b  d8"'    `"8b 88 88  d8"'    `"8b
 88      ,8P                         88      d8'`8b     Y8,         d8'           88 88 d8'
@@ -11,7 +11,7 @@
 88     `8b  "8a,   ,a88 88       88 88  d8'        `8b Y8a     a8P  Y8a.    .a8P 88 88  Y8a.    .a8P
 88      `8b  `"YbbdP'Y8 88       88 88 d8'          `8b "Y88888P"    `"Y8888Y"'  88 88   `"Y8888Y"'
 
-"""
+
 RunTASCIIc-v1.0.2
 This screensaver was constructed by me not only just for fun, but also as an excercise for
  GUI programming on Python.
