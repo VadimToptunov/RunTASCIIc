@@ -135,3 +135,30 @@ def random_version_choice():
 
 if __name__ == "__main__":
     random_version_choice()
+  
+  """
+ import Tkinter as tk
+import random
+
+root = tk.Tk()
+root.title("RunTASCIIc-v.1.0.2")
+root.attributes('-fullscreen', True)
+
+color = random.choice(('red', 'green', 'blue', 'violet', 'white', 'yellow'))
+text = tk.Text(root, font="Courier 20", bg="Black", fg=color, wrap=tk.WORD)
+text.pack(expand=True, fill="both")
+filename = open('C:/Users/vatoptun/PycharmProjects/screensaver/RunTASCIIC.py', 'r')
+r = filename.readlines()
+filename.close()
+
+
+def read_files():
+    global r
+    text.insert(tk.END, r[0])
+    r = r[1:]
+    text.after(500, read_files)
+    text.see(tk.END)
+
+read_files()
+tk.mainloop()
+  """
