@@ -17,15 +17,20 @@ This screensaver was constructed by me not only just for fun, but also as an exc
  GUI programming on Python.
  The screensaver opens a full-screen GUI window (black), randomly chooses a colour for text,
  randomly chooses version, shows you some random characters printed and locks screen. It can be closed with any key pressed.
- The project will be improved in such way:
- 1.It will get the 5th version, where random Python file or file with some other extension
-   will be shown as a text in the GUI window.
+ 
+ TO USE THE SCRIPT:
+ 
+ 1. Create a directory with differrent files with code (.py, .pl, .sh, .c, .h extensions), with readonly permission;
+ 2. Set the directory to the variable dir2walk;
+ 3. Run the script on your computer;
+ 4. PROFIT!!!
 """
 import os
 import random
 import string
 import Tkinter as tk
 
+dir2walk = "/your/directory/with/files/"
 
 def key(event):
     # Closes the app if any key is pressed.
@@ -53,7 +58,7 @@ def lock_screen():
         pass
 
 root = tk.Tk() # Run Tkinter
-root.title("RunTASCIIc-v.1.0.2")
+root.title("RunTASCIIc-v.1.0.3")
 root.attributes('-fullscreen', True) # Run the window in full-screen mode
 root.bind("<Key>", key) # Bind the press of any key
 
@@ -61,6 +66,24 @@ color = random.choice(('red', 'green', 'blue', 'violet', 'white', 'yellow')) # S
 text = tk.Text(root, font="Courier 20", bg="Black", fg=color) # Create text and text parameters
 text.pack(expand=True, fill="both")
 
+mask = random.choice(('.py', '.sh', '.h', '.c', '.pl'))
+
+for root, dirs, files in os.walk(dir2walk, topdown=False):
+    for fil in files:
+        path = os.path.join(root, fil)
+        if path.endswith(mask):
+            filename = open(path, 'r')
+            r = filename.readlines()
+            filename.close()
+        else: pass
+
+def read_files():
+ # The function shows a file line by line in GUI window.
+    global r
+    text.insert(tk.END, r[0])
+    r = r[1:]
+    text.after(500, read_files)
+    text.see(tk.END)
 
 def unicode_chars():
     # Random characters from Runic, Georgian, Tibetian, Thai and Khmer alphabets
@@ -111,7 +134,7 @@ def random_chars():
 
 def random_version_choice():
     # Chooses random version to show
-    version = random.choice(('v1', 'v2', 'v3', 'v4'))
+    version = random.choice(('v1', 'v2', 'v3', 'v4', 'v5'))
 
     if version == 'v1':
         # If version 1 is chosen, then random chars from Thai, Georgian and some other alphabets
@@ -130,35 +153,9 @@ def random_version_choice():
         root.mainloop()
 
     else:
-        # version 5 is coming. It would show code from some python files and files from other extensions
-        pass
+        text.after(500, read_files)
+        root.mainloop()
+     
 
 if __name__ == "__main__":
     random_version_choice()
-  
-  """
- import Tkinter as tk
-import random
-
-root = tk.Tk()
-root.title("RunTASCIIc-v.1.0.2")
-root.attributes('-fullscreen', True)
-
-color = random.choice(('red', 'green', 'blue', 'violet', 'white', 'yellow'))
-text = tk.Text(root, font="Courier 20", bg="Black", fg=color, wrap=tk.WORD)
-text.pack(expand=True, fill="both")
-filename = open('C:/Users/vatoptun/PycharmProjects/screensaver/RunTASCIIC.py', 'r')
-r = filename.readlines()
-filename.close()
-
-
-def read_files():
-    global r
-    text.insert(tk.END, r[0])
-    r = r[1:]
-    text.after(500, read_files)
-    text.see(tk.END)
-
-read_files()
-tk.mainloop()
-  """
