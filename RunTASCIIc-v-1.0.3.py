@@ -35,7 +35,7 @@ dir2walk = "/your/directory/with/files/"
 def key(event):
     # Closes the app if any key is pressed.
     lock_screen()
-    root.destroy()
+    rt.destroy()
     
     
 def lock_screen():
@@ -57,10 +57,10 @@ def lock_screen():
     else:
         pass
 
-root = tk.Tk() # Run Tkinter
-root.title("RunTASCIIc-v.1.0.3")
-root.attributes('-fullscreen', True) # Run the window in full-screen mode
-root.bind("<Key>", key) # Bind the press of any key
+rt = tk.Tk() # Run Tkinter
+rt.title("RunTASCIIc-v.1.0.3")
+rt.attributes('-fullscreen', True) # Run the window in full-screen mode
+rt.bind("<Key>", key) # Bind the press of any key
 
 color = random.choice(('red', 'green', 'blue', 'violet', 'white', 'yellow')) # Set random color
 text = tk.Text(root, font="Courier 20", bg="Black", fg=color) # Create text and text parameters
@@ -75,7 +75,6 @@ for root, dirs, files in os.walk(dir2walk, topdown=False):
             filename = open(path, 'r')
             r = filename.readlines()
             filename.close()
-        else: pass
 
 def read_files():
  # The function shows a file line by line in GUI window.
@@ -140,22 +139,22 @@ def random_version_choice():
         # If version 1 is chosen, then random chars from Thai, Georgian and some other alphabets
         # are shown in the window
         text.after(500, unicode_chars)
-        root.mainloop()
+        rt.mainloop()
     elif version == 'v2':
         # If version 2 is chosen, then random ASCII chars are printed in the window
         text.after(500, random_chars)
-        root.mainloop()
+        rt.mainloop()
     elif version == 'v3':
         text.after(1, char101)
-        root.mainloop()
+        rt.mainloop()
     elif version == 'v4':
         text.after(1, slash)
-        root.mainloop()
+        rt.mainloop()
 
-    else:
+    elif version  == 'v5':
         text.after(500, read_files)
-        root.mainloop()
+        rt.mainloop()
+    else: pass
      
-
 if __name__ == "__main__":
     random_version_choice()
