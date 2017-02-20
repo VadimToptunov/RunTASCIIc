@@ -6,10 +6,13 @@ This screensaver was constructed by me not only just for fun, but also as an exc
  The screensaver opens a full-screen GUI window (black), randomly chooses a colour for text,
  randomly chooses version and shows you some random characters printed. It can be closed with any key pressed.
 
- The project will be improved in such ways:
+It also shows you a file from special folder line by line.
 
- 1. It will lock the screen for Linux if you do nothing;
- 2. It will get the 3rd version, where random Python or file with some other extension
-   will be shown as a text in the GUI window.
+To use the screensaver:
+
+1. Create a folder with a bunch of .py, .pl, .sh., .h and .c files, which contain code;
+2. Set the folder to the screensaver code;
+3. Run the screensaver;
+4. PROFIT!!!
    
   
