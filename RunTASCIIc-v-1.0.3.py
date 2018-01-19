@@ -63,14 +63,14 @@ rt.attributes('-fullscreen', True) # Run the window in full-screen mode
 rt.bind("<Key>", key) # Bind the press of any key
 
 color = random.choice(('red', 'green', 'blue', 'violet', 'white', 'yellow')) # Set random color
-text = tk.Text(root, font="Courier 20", bg="Black", fg=color) # Create text and text parameters
+text = tk.Text(rt, font="Courier 20", bg="Black", fg=color) # Create text and text parameters
 text.pack(expand=True, fill="both")
 
 mask = random.choice(('.py', '.sh', '.h', '.c', '.pl'))
 
-for root, dirs, files in os.walk(dir2walk, topdown=False):
+for rt, dirs, files in os.walk(dir2walk, topdown=False):
     for fil in files:
-        path = os.path.join(root, fil)
+        path = os.path.join(rt, fil)
         if path.endswith(mask):
             filename = open(path, 'r')
             r = filename.readlines()
