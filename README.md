@@ -109,4 +109,4 @@ true.
 
 ## License
 
-Provided as-is for fun and learning.
+[MIT](LICENSE) © Vadim Toptunov
