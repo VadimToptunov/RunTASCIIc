@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 """RunTASCIIc -- a tiny "digital rain" screensaver.
 
-Opens a full-screen black window, picks a random colour and a random visual
-mode, and streams characters down the screen. Press any key to lock the screen
-and quit.
+Opens a full-screen black window, picks a colour and a visual mode, and either
+rains glyphs down in falling columns (Matrix-style) or streams random lines of
+text. Press any key to lock the screen and quit.
 
 Originally a Python 2 / Tkinter exercise; rewritten for Python 3 to run on
 macOS and Linux (and Windows too).
 
 Usage:
-    python3 runtasciic.py
-    python3 runtasciic.py --mode binary --color green
-    python3 runtasciic.py --no-lock        # don't lock the screen on exit
+    python3 runtasciic.py                      # random mode + colour
+    python3 runtasciic.py --mode rain --color green
+    python3 runtasciic.py --mode binary
+    python3 runtasciic.py --no-lock            # don't lock the screen on exit
 """
 
 import argparse
@@ -21,9 +22,10 @@ import random
 import string
 import subprocess
 import tkinter as tk
+import tkinter.font as tkfont
 
 __author__ = "Vadim Toptunov"
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 BANNER = r'''
 88888888ba                     888888888888   db        ad88888ba    ,ad8888ba,  88 88   ,ad8888ba,
@@ -48,6 +50,20 @@ UNICODE_RANGES = (
 
 COLORS = ("red", "green", "blue", "violet", "white", "yellow", "cyan", "orange")
 
+# Base RGB used to tint the rain (and its bright head).
+COLOR_RGB = {
+    "red": (255, 60, 60),
+    "green": (0, 255, 70),
+    "blue": (90, 130, 255),
+    "violet": (200, 120, 255),
+    "white": (235, 235, 235),
+    "yellow": (255, 235, 60),
+    "cyan": (60, 255, 235),
+    "orange": (255, 160, 40),
+}
+
+MODES = ("rain", "unicode", "ascii", "binary", "slash")
+
 
 def _unicode_pool():
     """Every printable code point from the exotic blocks above, as a string."""
@@ -58,6 +74,23 @@ def _unicode_pool():
             if ch.isprintable():
                 chars.append(ch)
     return "".join(chars)
+
+
+def rain_gradient(base, length):
+    """A list of `length` hex colours: bright/near-white head fading to dark.
+
+    Index 0 is the head (base blended toward white); later indices fade the
+    base colour toward black along the trailing tail.
+    """
+    r, g, b = base
+    colors = [f"#{int(r + (255 - r) * 0.75):02x}"
+              f"{int(g + (255 - g) * 0.75):02x}"
+              f"{int(b + (255 - b) * 0.75):02x}"]
+    for i in range(1, length):
+        # fade from full brightness (i==1) down to ~10% at the tail
+        f = 1.0 - (i - 1) / max(length - 1, 1) * 0.9
+        colors.append(f"#{int(r * f):02x}{int(g * f):02x}{int(b * f):02x}")
+    return colors
 
 
 def lock_screen():
@@ -100,25 +133,27 @@ def lock_screen():
 
 
 class Screensaver:
-    """A full-screen Tkinter window that streams random text downward."""
+    """A full-screen Tkinter window: Matrix-style rain or streaming text."""
 
     MAX_LINES = 200          # cap the text buffer so memory stays bounded
     MAX_LINE_LEN = 140       # longest generated line
+    RAIN_INTERVAL = 70       # ms per rain frame
+    RAIN_FONT_SIZE = 20
 
     def __init__(self, mode=None, color=None, lock=True):
         self.lock = lock
         self._unicode_chars = _unicode_pool()
 
-        # name -> (generator, interval_ms)
-        self._modes = {
+        # text modes: name -> (generator, interval_ms)
+        self._text_modes = {
             "unicode": (self._gen_unicode, 250),
             "ascii": (self._gen_ascii, 250),
             "binary": (self._gen_binary, 120),
             "slash": (self._gen_slash, 120),
         }
 
-        self.mode = mode if mode in self._modes else random.choice(list(self._modes))
-        chosen_color = color if color in COLORS else random.choice(COLORS)
+        self.mode = mode if mode in MODES else random.choice(MODES)
+        self.color_name = color if color in COLORS else random.choice(COLORS)
 
         self.root = tk.Tk()
         self.root.title(f"RunTASCIIc v{__version__}")
@@ -126,21 +161,26 @@ class Screensaver:
         self.root.attributes("-fullscreen", True)
         self.root.bind("<Key>", self._on_key)
 
+        self._after_id = None
+        if self.mode == "rain":
+            self._build_rain()
+        else:
+            self._build_text()
+
+    # -- text renderer -----------------------------------------------------
+
+    def _build_text(self):
         self.text = tk.Text(
             self.root,
             font="Courier 20",
             bg="black",
-            fg=chosen_color,
+            fg=self.color_name,
             bd=0,
             highlightthickness=0,
             cursor="none",
             wrap="char",
         )
         self.text.pack(expand=True, fill="both")
-
-        self._after_id = None
-
-    # -- content generators ------------------------------------------------
 
     def _gen_unicode(self):
         n = random.randint(1, self.MAX_LINE_LEN)
@@ -162,10 +202,8 @@ class Screensaver:
         n = random.randint(1, self.MAX_LINE_LEN)
         return "".join(random.choice(symbols) for _ in range(n))
 
-    # -- animation loop ----------------------------------------------------
-
     def _tick(self):
-        generate, interval = self._modes[self.mode]
+        generate, interval = self._text_modes[self.mode]
         self.text.insert(tk.END, generate() + "\n")
         self._trim()
         self.text.see(tk.END)
@@ -177,6 +215,81 @@ class Screensaver:
         if last > self.MAX_LINES:
             self.text.delete("1.0", f"{last - self.MAX_LINES}.0")
 
+    # -- rain renderer -----------------------------------------------------
+
+    def _build_rain(self):
+        self.width = self.root.winfo_screenwidth()
+        self.height = self.root.winfo_screenheight()
+
+        self.canvas = tk.Canvas(
+            self.root, bg="black", bd=0, highlightthickness=0, cursor="none"
+        )
+        self.canvas.pack(expand=True, fill="both")
+
+        self.rain_font = tkfont.Font(
+            family="Courier", size=self.RAIN_FONT_SIZE, weight="bold"
+        )
+        self.cell_w = max(self.rain_font.measure("W"), 8)
+        self.cell_h = max(self.rain_font.metrics("linespace"), 8)
+        self.rows = self.height // self.cell_h + 2
+        self.base = COLOR_RGB.get(self.color_name, COLOR_RGB["green"])
+
+        # One falling drop per column; each item is anchored at the column's x,
+        # so glyph width never breaks column alignment.
+        self._columns = []
+        n_cols = self.width // self.cell_w
+        for i in range(n_cols):
+            self._columns.append(self._new_column(i, warm_start=True))
+
+    def _new_column(self, index, warm_start=False):
+        trail = random.randint(6, 24)
+        start = -random.randint(0, self.rows) if warm_start else -random.randint(0, trail)
+        return {
+            "index": index,
+            "x": index * self.cell_w + self.cell_w // 2,
+            "y": start,                       # head row (may be above screen)
+            "trail": trail,
+            "step": random.choice((1, 1, 2, 2, 3)),  # ticks per row -> speed
+            "items": [],                      # canvas ids, oldest first
+            "colors": rain_gradient(self.base, trail),
+        }
+
+    def _rain_tick(self):
+        self._frame += 1
+        c = self.canvas
+        for i, col in enumerate(self._columns):
+            if self._frame % col["step"] != 0:
+                continue
+
+            row = col["y"]
+            col["y"] += 1
+            item = c.create_text(
+                col["x"], row * self.cell_h,
+                text=random.choice(self._unicode_chars),
+                fill=col["colors"][0],
+                font=self.rain_font,
+                anchor="n",
+            )
+            col["items"].append(item)
+
+            # keep only the trail; drop the glyph that fell off the tail
+            while len(col["items"]) > col["trail"]:
+                c.delete(col["items"].pop(0))
+
+            # recolour the trail: head bright, tail fading to dark
+            n = len(col["items"])
+            for j, it in enumerate(col["items"]):
+                dist = (n - 1) - j          # 0 == head
+                c.itemconfigure(it, fill=col["colors"][min(dist, col["trail"] - 1)])
+
+            # recycle the column once its head is well past the bottom
+            if row * self.cell_h > self.height + col["trail"] * self.cell_h:
+                for it in col["items"]:
+                    c.delete(it)
+                self._columns[i] = self._new_column(col["index"])
+
+        self._after_id = self.root.after(self.RAIN_INTERVAL, self._rain_tick)
+
     # -- lifecycle ---------------------------------------------------------
 
     def _on_key(self, _event):
@@ -187,8 +300,12 @@ class Screensaver:
         self.root.destroy()
 
     def run(self):
-        _, interval = self._modes[self.mode]
-        self._after_id = self.root.after(interval, self._tick)
+        if self.mode == "rain":
+            self._frame = 0
+            self._after_id = self.root.after(self.RAIN_INTERVAL, self._rain_tick)
+        else:
+            _, interval = self._text_modes[self.mode]
+            self._after_id = self.root.after(interval, self._tick)
         self.root.mainloop()
 
 
@@ -198,7 +315,7 @@ def parse_args():
     )
     parser.add_argument(
         "--mode",
-        choices=("unicode", "ascii", "binary", "slash"),
+        choices=MODES,
         help="Visual mode (default: random).",
     )
     parser.add_argument(
