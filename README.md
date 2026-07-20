@@ -20,6 +20,8 @@ screen and quit.
 Originally a Python 2 / Tkinter toy; now rewritten for **Python 3** and runs on
 macOS and Linux (and Windows too).
 
+![RunTASCIIc in unicode mode](assets/screenshot.png)
+
 ## Contents
 
 - [Modes](#modes)
