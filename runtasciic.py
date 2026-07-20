@@ -25,7 +25,7 @@ import tkinter as tk
 import tkinter.font as tkfont
 
 __author__ = "Vadim Toptunov"
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 BANNER = r'''
 88888888ba                     888888888888   db        ad88888ba    ,ad8888ba,  88 88   ,ad8888ba,
@@ -167,12 +167,33 @@ class Screensaver:
         else:
             self._build_text()
 
+    # -- glyph coverage ----------------------------------------------------
+
+    @staticmethod
+    def _renderable(font, pool):
+        """Drop code points `font` can't draw, so no .notdef boxes appear.
+
+        Tk falls back per-character on macOS/Windows, so most glyphs survive
+        there; on Linux without a covering font the uncovered ones are removed.
+        Detection: a code point renders as the "missing glyph" box iff its
+        measured width equals that of a noncharacter (which never has a glyph).
+        If the two reference noncharacters disagree we can't tell, so keep all.
+        """
+        missing = font.measure("￿")
+        if missing != font.measure("\U0010FFFF"):
+            return pool
+        filtered = "".join(ch for ch in pool if font.measure(ch) != missing)
+        return filtered or pool          # never return an empty pool
+
     # -- text renderer -----------------------------------------------------
 
     def _build_text(self):
+        text_font = tkfont.Font(family="Courier", size=20)
+        if self.mode == "unicode":
+            self._unicode_chars = self._renderable(text_font, self._unicode_chars)
         self.text = tk.Text(
             self.root,
-            font="Courier 20",
+            font=text_font,
             bg="black",
             fg=self.color_name,
             bd=0,
@@ -229,6 +250,7 @@ class Screensaver:
         self.rain_font = tkfont.Font(
             family="Courier", size=self.RAIN_FONT_SIZE, weight="bold"
         )
+        self._unicode_chars = self._renderable(self.rain_font, self._unicode_chars)
         self.cell_w = max(self.rain_font.measure("W"), 8)
         self.cell_h = max(self.rain_font.metrics("linespace"), 8)
         self.rows = self.height // self.cell_h + 2

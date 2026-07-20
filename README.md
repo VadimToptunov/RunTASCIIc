@@ -90,6 +90,11 @@ the way out.
   returns one line of characters, appended and auto-scrolled every tick. The
   buffer is capped (`MAX_LINES`) so memory stays bounded no matter how long it
   runs.
+- Before streaming glyphs, the exotic-Unicode pool is filtered to the code
+  points the active font can actually draw (probed via Tk font metrics), so no
+  ".notdef" boxes appear even where a script isn't covered. On macOS/Windows Tk
+  falls back per-character, so everything renders; on a sparse Linux font the
+  uncovered glyphs are simply dropped.
 - On exit, `lock_screen()` tries platform-appropriate lock commands in order
   (macOS `CGSession`/`pmset`, Linux `loginctl`/`xdg-screensaver`/…, Windows
   `rundll32`) and never raises if none are available.
